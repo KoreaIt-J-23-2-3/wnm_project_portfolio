@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=120&text=Woof & Mewo &section=header" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=120&text=WoofnMewo&section=header" />
 
 # Woof & Meow
 
