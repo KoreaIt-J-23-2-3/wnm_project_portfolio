@@ -1,4 +1,4 @@
-![image](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/121537196/9894e1b8-bd41-4a6d-9171-2d98ac00cf5f)<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=header" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=120&section=header" />
 
 # Woof & Meow
 
@@ -19,7 +19,7 @@
 ## **📗 목차**
 
 ### 🧭 **프로젝트 개발 기간**
-
+![개발일정](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/121537196/7d2a748f-634b-4723-bfe1-ffabaee3e0f4)
 
 ### 역할 분담
 
