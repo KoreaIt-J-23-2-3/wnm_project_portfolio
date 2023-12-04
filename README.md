@@ -53,6 +53,17 @@
 
 ![개발일정](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/121537196/7d2a748f-634b-4723-bfe1-ffabaee3e0f4)
 
+<br/>
+
+## **🔗 API명세서와 ERD설계도**
+
+### API 명세서
+
+<br/>
+
+### ERD 설계도
+
+<br/>
 ### 역할 분담
 
 #### 정대풍 (팀장)
