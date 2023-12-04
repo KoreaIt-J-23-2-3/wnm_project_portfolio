@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=header" />
+![image](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/121537196/9894e1b8-bd41-4a6d-9171-2d98ac00cf5f)<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=header" />
 
 # Woof & Meow
 
@@ -13,10 +13,36 @@
 
 ![jquery](https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white)
 
+### 개발 환경
+
+
 ## **📗 목차**
 
-### 🧭 프로젝트 개발 기간
-![개발일정](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/121537196/3257164b-a2a8-4016-bc3e-55bb299a86d5)
+### 🧭 **프로젝트 개발 기간**
+![개발일정](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/121537196/df20cf52-1f3b-43e2-ad5e-9e72999599d6)
+
+### 역할 분담
+
+#### 정대풍 (팀장)
+ -
+ -
+ -
+ -
+#### 이동헌
+ -
+ -
+ -
+ -
+#### 임예림
+ -
+ -
+ -
+ -
+#### 장호진
+ -
+ -
+ -
+ -
 
 
 ### `주요 기능 및 예제`
