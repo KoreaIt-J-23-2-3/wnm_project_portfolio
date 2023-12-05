@@ -103,7 +103,6 @@
 - 회의록 작성
 
 <p align="right"><a href="#top">TOP 🔼</a></p>
-
 <br/>
 
 ## **🛠 개발 도구**
@@ -128,12 +127,14 @@
 ### Data
 <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
 
+<p align="right"><a href="#top">TOP 🔼</a></p>
 <br/>
 
 ## **⏰ 프로젝트 일정**
 
 ![개발일정](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/121537196/7d2a748f-634b-4723-bfe1-ffabaee3e0f4)
 
+<p align="right"><a href="#top">TOP 🔼</a></p>
 <br/>
 
 ## **🔗 API명세서와 ERD설계도**
@@ -148,9 +149,20 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
 ![WoofNMeow_ERD ](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/de2d7ae5-ac10-47ac-8cc1-eff351a216ad)
 
 <p align="right"><a href="#top">TOP 🔼</a></p>
+<br/>
+
+## **📝 메뉴구조도**
+
+### User 메뉴구조도
+<img width="1366" alt="User메뉴구조도" src="https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/6cf83521-1c1d-48d3-be0c-063fa75357ae">
 
 <br/>
 
-### `주요 기능 및 예제`
-프로젝트의 주요 기능 및 사용 예제를 제공합니다.
+### Admin 메뉴구조도
+<img width="1366" alt="Admin메뉴구조도" src="https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/63cf70f2-53b8-4c01-8ba1-6f0d934d3e0f">
+
+<p align="right"><a href="#top">TOP 🔼</a></p>
+<br/>
+
+
 
