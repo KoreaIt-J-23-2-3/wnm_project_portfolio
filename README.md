@@ -90,10 +90,10 @@
 <br/>
 
 > **팀원: 임예림** 
-### BackEnd
+### Back-End
 - 리뷰 CRUD 기능 구현
   
-### FrontEnd
+### Front-End
 - 회원가입 페이지 기능 구현 및 CSS
 - 간편로그인 페이지 기능 구현 및 CSS
 - 회원 수정 페이지 기능 구현 및 CSS
@@ -103,6 +103,30 @@
 - 회의록 작성
 
 <p align="right"><a href="#top">TOP 🔼</a></p>
+
+<br/>
+
+## **🛠 개발 도구**
+
+<br/>
+
+### Back-End
+
+<img src="https://img.shields.io/badge/JAVA-007396?style=for-the-badge&logo=java&logoColor=white"> <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white">
+
+### Front-End
+
+<img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=for-the-badge&logo=Visual Studio Code&logoColor=white"/> <img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"> 
+<img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white"> 
+<img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> 
+<img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black"> 
+
+
+### SCM(형상관리)
+<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+
+### Data
+<img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
 
 <br/>
 
