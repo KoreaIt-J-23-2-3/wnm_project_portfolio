@@ -165,4 +165,24 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
 <br/>
 
 
+## **✍ 느낀점**
 
+<br/>
+
+> **팀장: 정대풍** 
+- 
+<br/>
+
+> **팀원: 장호진** 
+- 
+<br/>
+
+> **팀원: 이동헌** 
+-
+<br/>
+
+> **팀원: 임예림** 
+-
+
+<p align="right"><a href="#top">TOP 🔼</a></p>
+<br/>
