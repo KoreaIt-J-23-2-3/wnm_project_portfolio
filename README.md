@@ -202,6 +202,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <summary>회원가입 영상</summary>
   <div markdown="1">
 
+![회원가입](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/9158d176-e9aa-4606-9e72-256f8ec6440c)
+
   
   </div>
   </details>
@@ -211,7 +213,10 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <summary>간편 로그인 영상(구글, 카카오, 네이버)</summary>
   <div markdown="1">
   
-  // 영상 넣는곳
+![구글 로그인](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/53f6adf8-12b3-45e5-8c12-f88d1ff47bcf)
+![카카오 로그인](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/aa8847ae-8a33-467f-9d29-ffb040e68d19)
+![네이버 로그인](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/84eda95c-3f11-4d4f-adf8-e655ae0abcb2)
+
   
   </div>
   </details>
@@ -224,8 +229,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <summary>상품 관련 페이지 영상</summary>
   <div markdown="1">
   
-  // 영상 넣는곳
-  
+![상품 관련 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/68a8fd9c-872b-418c-8ef7-760831a1e472)
+
   </div>
   </details>
   
@@ -236,7 +241,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <summary>장바구니 페이지 영상</summary>
   <div markdown="1">
   
-  // 영상 넣는곳
+  ![장바구니 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/3470cdfe-7dd3-4f4b-bc49-ef36879245fe)
+
   
   </div>
   </details>
@@ -244,10 +250,21 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
 
 ### **구매 페이지**
   <details>
-  <summary>구매 페이지 영상</summary>
+  <summary>상품 바로 구매 영상</summary>
   <div markdown="1">
   
-  // 영상 넣는곳
+![상품 바로 구매](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/6a0a50f1-67c9-4a6a-a70b-bb9d9aebe435)
+
+  
+  </div>
+  </details>
+  
+  <details>
+  <summary>장바구니 구매 영상</summary>
+  <div markdown="1">
+  
+![장바구니 구매](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/66b8bd78-e5b5-4d61-ab47-5679f7410f82)
+
   
   </div>
   </details>
@@ -259,19 +276,21 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <summary>리뷰 페이지 영상</summary>
   <div markdown="1">
   
-  // 영상 넣는곳
+![리뷰 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/fbfe5c35-1140-4276-8e6a-837349d4c588)
+
   
   </div>
   </details>
+
 <br/>
 
 ### **관리자용 회원 주문 내역 관리 페이지**
   <details>
   <summary>관리자용 회원 주문 내역 관련 페이지 영상 </summary>
   <div markdown="1">
-  
-  // 영상 넣는곳
-  
+    
+![관리자용 회원 주문 내역 관리](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/fbd6d0fc-c262-4bef-aafa-6746af695b8b)
+
   </div>
   </details>
 <br/>
@@ -280,8 +299,9 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <details>
   <summary>관리자용 상품 관련 페이지 영상</summary>
   <div markdown="1">
-  
-  // 영상 넣는곳
+    
+![관리자용 상품 관리 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/2bab739f-90bb-4522-842b-fd09f2878b30)
+
   
   </div>
   </details>
@@ -292,7 +312,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <summary>공지사항 페이지 영상</summary>
   <div markdown="1">
 
-![공지사항 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/7d0a4b2e-487f-4b12-b05a-6091bb30d2f4)
+  ![공지사항 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/7d0a4b2e-487f-4b12-b05a-6091bb30d2f4)
 
 
   </div>
