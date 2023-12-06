@@ -310,9 +310,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <summary>공지사항 페이지 영상</summary>
   <div markdown="1">
 
-  ![공지사항 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/7d0a4b2e-487f-4b12-b05a-6091bb30d2f4)
-![공지사항](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/e99fe99a-07b1-43c8-8330-4222b349cf98)
-
+![공지사항 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/7d0a4b2e-487f-4b12-b05a-6091bb30d2f4)
 
   </div>
   </details>
