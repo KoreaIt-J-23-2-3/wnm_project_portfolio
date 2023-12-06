@@ -203,11 +203,9 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   <div markdown="1">
 
 ![회원가입](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/9158d176-e9aa-4606-9e72-256f8ec6440c)
-
-  
+ 
   </div>
   </details>
-<br/>
 
   <details>
   <summary>간편 로그인 영상(구글, 카카오, 네이버)</summary>
