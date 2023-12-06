@@ -30,13 +30,27 @@
 
 ## **🏆 프로젝트 소개**
 
-- 프로젝트 제목 - 온라인 반려견 & 반려묘 쇼핑몰 "Woof&Meow" 웹 개발
+- 프로젝트 제목
+  - 온라인 반려견 & 반려묘 쇼핑몰 "Woof&Meow" 웹 개발
 
-- 프로젝트 목적 - 학습한 내용 복습 및 활용, 팀원들과의 협업에 대한 이해
+- 프로젝트 목적
+  - 학습한 내용 복습 및 활용, 팀원들과의 협업에 대한 이해
 
-- 분류 - 팀 프로젝트
+- 분류
+  - 팀 프로젝트
 
-- 제작 기간 - 2023.11.01 ~ 2023.11.28
+- 제작 기간
+  - 2023.11.01 ~ 2023.11.28
+
+- 주요기능
+  - 회원가입 및 Oauth2 로그인 기능
+  - 카테고리 별 상품 검색 기능
+  - 간편 결제(Kakao / Toss) 기능
+  - 장바구니 기능
+  - 리뷰 기능
+  - 관리자용 회원 주문 내역 관리 및 배송 상태 변경 기능
+  - 관리자용 상품 관리 및 입/출고 기능
+  - 공지사항 기능 
   
 <p align="right"><a href="#top">TOP 🔼</a></p>
 <br/>
@@ -184,34 +198,92 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
 <br/>
 
 ### **Oauth2 회원가입 및 로그인 페이지**
-
+  <details>
+  <summary>회원가입 및 로그인 영상</summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
 <br/>
 
 ### **상품 페이지**
-
+  <details>
+  <summary>상품 관련 페이지 영상</summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
+  
 <br/>
 
 ### **구매 페이지**
-
+  <details>
+  <summary>구매 페이지 영상</summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
 <br/>
 
 ### **장바구니 페이지**
-
+  <details>
+  <summary>장바구니 페이지 영상</summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
 <br/>
 
 ### **리뷰 페이지**
-
+  <details>
+  <summary>리뷰 페이지 영상</summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
 <br/>
 
 ### **관리자용 회원 주문 내역 관리 페이지**
-
+  <details>
+  <summary>관리자용 회원 주문 내역 관련 페이지 영상 </summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
 <br/>
 
 ### **관리자용 상품 관리 페이지**
-
+  <details>
+  <summary>관리자용 상품 관련 페이지 영상</summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
 <br/>
 
 ### **공지사항 페이지**
+  <details>
+  <summary>공지사항 페이지 영상</summary>
+  <div markdown="1">
+  
+  // 영상 넣는곳
+  
+  </div>
+  </details>
 
 <p align="right"><a href="#top">TOP 🔼</a></p>
 <br/>
