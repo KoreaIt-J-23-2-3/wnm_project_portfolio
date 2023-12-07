@@ -522,6 +522,35 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       {call p_add_cart(#{userId}, #{productDtlId}, #{count})}
   </insert>
   ```
+  ```PROCEDURE
+  CREATE DEFINER=`woofnmeow`@`%` PROCEDURE `p_add_cart`(
+	in vn_user_id int,
+	in vn_product_dtl_id int,
+    in vn_count int
+  )
+  BEGIN
+  	declare vn_search_count int;
+  
+  	select
+  		count(*) into vn_search_count
+      from
+  		cart_tb
+  	where
+  		user_id = vn_user_id
+  		and product_dtl_id = vn_product_dtl_id;
+  
+  	if vn_search_count = 0 then 
+  		insert into cart_tb
+  		values(0, vn_user_id, vn_product_dtl_id, vn_count);
+  	else
+  		update cart_tb
+  		set count = count + vn_count
+  		where
+  			user_id = vn_user_id
+  		and product_dtl_id = vn_product_dtl_id;
+      end if;
+  END
+  ```
   -
   
   ```xml
