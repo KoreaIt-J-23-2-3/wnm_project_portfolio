@@ -244,7 +244,51 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   
   </div>
   </details>
-<br/>
+  
+  <details>
+  <summary>장바구니 등록 코드 리뷰</summary>
+  <div markdown="1">
+
+  ## Front-End
+  **요청**
+  ```javascript
+       const handleAddToCartOnClick = async () => {
+        try {
+            const option = {
+                headers: {
+                    Authorization: localStorage.getItem("accessToken")
+                }
+            }
+            if(!principal.data) {
+                alert("로그인 후 사용해주세요.")
+                navigate("/auth/signin")
+            } else {
+                if(selectedProducts.length === 0) {
+                    alert("상품을 선택해주세요.")
+                } else {
+                    if(window.confirm("해당 상품을 장바구니에 담겠습니까?")) {
+                        addToCartApi(principal.data.data.userId, [...selectedProducts], option);
+                        alert("장바구니에 상품이 정상적으로 담겼습니다.")
+                        navigate(`/product/cart/${principal?.data?.data?.userId}`)
+                    } else {
+                        alert("취소되었습니다.")
+                    }
+                }
+            }
+        } catch(error) {
+            console.log(error)
+        }
+    }
+  ```
+  <br/>
+
+  - accessToken이 있는 상태에서 장바구니를 등록할 수 있다.
+  - 장바구니에 상품을 등록시 로그인한 유저의 userId와 선택한 상품 및 상품 수량의 데이터가 Back-End로 넘어간다.
+  
+  </div>
+  </details>
+
+  <br/>
 
 ### **구매 페이지**
   <details>
