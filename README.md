@@ -632,6 +632,298 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   
   </div>
   </details>
+
+  <details>
+  <summary>상품 바로 구매 및 장바구니 상품 구매 코드 리뷰</summary>
+  <div markdown="1">
+
+  ## Front-End
+  **상품 바로 구매**
+  ```javascript
+    const buyNowOnClick = () => {
+        if(!principal.data) {
+            alert("로그인 후 사용해주세요.")
+            navigate("/auth/signin")
+        } else {
+            if(selectedProducts.length === 0) {
+                alert("상품을 선택해주세요.")
+            } else {
+                localStorage.setItem("orderData", JSON.stringify(selectedProducts));
+                localStorage.setItem("isCart", false);
+                navigate("/order")
+            }
+        }
+    }
+  ```
+  - 
+  <br/>
+
+  **장바구니 상품 구매**
+  ```javascript
+    const handleBuyOnClick = () => {
+        if(!principal.data) {
+            alert("로그인 후 사용해주세요.")
+            navigate("/auth/signin")
+        } else {
+            if(selectedCartProduct.length === 0) {
+                alert("상품을 선택해주세요.")
+            } else {
+                const overStockProducts = cartProducts.filter(cp => selectedCartProduct.filter(scp => scp.productDtlId === cp.productDtl.productDtlId)[0]?.count > cp.productDtl.tempStock);
+                if(overStockProducts.length > 0) {
+                    alert(`상품의 재고가 부족합니다.\n${overStockProducts?.map(osp => {
+                        return `${osp.productDtl.productMst.productName}[size: ${osp.productDtl.size.sizeName}]\n`
+                    }).join("")}`)
+                    return
+                } 
+                localStorage.setItem("orderData", JSON.stringify(selectedCartProduct))
+                localStorage.setItem("isCart", true);
+                navigate("/order")
+            }
+        }
+    }
+  ```
+  - 
+  <br/>
+  
+  **구매 페이지**
+  ```javascript
+    const [ buyProductList, setBuyProductList ] = useState(JSON.parse(localStorage.getItem("orderData")));
+  ```
+  - 
+  <br/>
+
+  **구매 버튼(KakaoPay, TossPay)**
+ ```javascript
+    const handlePaymentSubmit = (provider) => {
+        if(!window.IMP) {return} 
+        const { IMP } = window;
+        IMP.init("imp31774216");
+
+        const paymentData = {
+            pg: "",
+            pay_method: "",
+            merchant_uid: `mid_${new Date().getTime()}`, // 구매자 식별코드(결제날,시간)
+            amount: priceInfo.finalPrice, // 금액
+            name:  'Woof&Meow',// 상품이름
+            buyer_name: principal?.data?.data?.name, // 구매자 이름
+            buyer_email: principal?.data?.data?.email
+        }
+
+        switch(provider) {
+            case "kakao": 
+                paymentData.pg = "kakaopay";
+                paymentData.pay_method = "kakaopay";
+                break;
+            case "toss": 
+                paymentData.pg = "tosspay";
+                paymentData.pay_method = "tosspay";
+                break;
+        }
+
+        IMP.request_pay(paymentData, (response) => {
+            const { success, error_msg } = response;
+
+            if(success) {
+                const option = {
+                    headers: {
+                        Authorization: localStorage.getItem("accessToken")
+                    }
+                }
+
+                const order = {
+                    userId: principal.data.data.userId,
+                    shippingName: shippingUserInfo.name,
+                    shippingPhone: shippingUserInfo.phone,
+                    shippingAddressNumber: shippingUserInfo.addressNumber,
+                    shippingAddressName: shippingUserInfo.addressName,
+                    shippingAddressDetailName: shippingUserInfo.addressDetailName,
+                    orderProductData: [...buyProductList],
+                    isCart: localStorage.getItem("isCart")
+                }
+
+                addOrderApi(order, option)
+                .then(response => {
+                    alert("결제가 완료되었습니다.");
+                    localStorage.removeItem("orderData")
+                    navigate("/")
+                    console.log(response);
+                })
+            } else {
+                alert(error_msg)
+            }
+        });
+    }
+ ```
+  - 
+  <br/>
+
+  
+  ## Back-End
+  **Controller**
+  ```java
+    @PostMapping("/api/order")
+    public ResponseEntity<?> addOrder(@RequestBody AddOrderReqDto addOrderReqDto) {
+        return ResponseEntity.ok().body(orderService.addOrder(addOrderReqDto));
+    }
+  ```
+  -
+  <br/>
+
+  **Dto**
+  ```java
+    @Data
+    public class AddOrderReqDto {
+    // 배송지 정보
+    private int userId;
+    private String shippingName;
+    private String shippingPhone;
+    private String shippingAddressNumber;
+    private String shippingAddressName;
+    private String shippingAddressDetailName;
+    // 주문 상품 정보
+    private List<OrderProductsReqDto> orderProductData;
+    // 장바구니 구매, 바로 구매 구별
+    private Boolean isCart;
+
+    public Order toOrderEntity() {
+        return Order.builder()
+                .userId(userId)
+                .shippingName(shippingName)
+                .shippingPhone(shippingPhone)
+                .shippingAddressNumber(shippingAddressNumber)
+                .shippingAddressName(shippingAddressName)
+                .shippingAddressDetailName(shippingAddressDetailName)
+                .build();
+    }
+}
+  ```
+  -
+  <br/>
+
+  **Entity**
+  ```java
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Data
+  @Builder
+  public class Order {
+      private int orderId;
+      private int userId;
+      private LocalDateTime orderDate;
+      private LocalDateTime orderUpdateDate;
+      private String shippingName;
+      private String shippingPhone;
+      private String shippingAddressNumber;
+      private String shippingAddressName;
+      private String shippingAddressDetailName;
+      private int orderStatus;
+  ```
+  -
+  ```java
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  @Data
+  public class OrderProducts {
+      private int orderProductsId;
+      private int orderId;
+      private int productDtlId;
+      private int count;
+  ```
+  -
+  <br/>
+  
+  **Repository**
+  ```java
+@Mapper
+public interface OrderMapper {
+    @Options(useGeneratedKeys = true, keyProperty = "orderId")
+    public Integer insertOrder(Order order);
+    public Integer insertProductsToOrder(Map<String, Object> reqMap);
+}
+  ```
+  -
+  
+  ```java
+@Mapper
+public interface CartMapper {
+    public int deleteProductOfCartWhenIsCart(DeleteOrderCartVo deleteOrderCartVo);
+}
+  ```
+  -
+  <br/>
+  
+  
+  **mapper(MyBatis)**
+  ```xml
+    <insert id="insertOrder" parameterType="com.woofnmeow.wnm_project_back.entity.Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into
+            order_tb
+        values
+            (0, #{userId}, now(), now(), #{shippingName}, #{shippingPhone}, #{shippingAddressNumber}, #{shippingAddressName}, #{shippingAddressDetailName}, 0)
+    </insert>
+  ```
+  -
+  
+  ```xml
+    <delete id="deleteProductOfCartWhenIsCart">
+        delete
+        from
+            cart_tb
+        where
+            user_id = #{userId}
+        and product_dtl_id in (
+        <foreach collection="products" item="productDtlId" separator=",">
+            #{productDtlId}
+        </foreach>
+        )
+    </delete>
+  ```
+  -
+  <br/>
+
+  **Vo**
+  ```java
+  @Builder
+  @Data
+  public class DeleteOrderCartVo {
+      private int userId;
+      private List<Integer> products;
+  }
+  ```
+  -
+  <br/>
+  
+  **Service**
+  ```java
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addOrder(AddOrderReqDto addOrderReqDto) {
+        try {
+            Order order = addOrderReqDto.toOrderEntity();
+            orderMapper.insertOrder(order);
+            addOrderReqDto.getOrderProductData().forEach(productData -> {
+                orderMapper.insertProductsToOrder(productData.toProductDtlMap(order.getOrderId()));
+            });
+            if(addOrderReqDto.getIsCart()) {
+                cartMapper.deleteProductOfCartWhenIsCart(DeleteOrderCartVo.builder()
+                        .userId(addOrderReqDto.getUserId())
+                        .products(addOrderReqDto.getOrderProductData().stream()
+                                .map(orderProduct -> orderProduct.getProductDtlId())
+                                .collect(Collectors.toList()))
+                        .build());
+            }
+            return true;
+        }catch (Exception e) {
+            throw new OrderException
+                    (errorMapper.errorMapper("주문 오류", "주문 중 오류가 발생하였습니다."));
+        }
+    }
+  ```
+  -
+  <br/>
+  
+  </div>
+  </details>
 <br/>
 
 
