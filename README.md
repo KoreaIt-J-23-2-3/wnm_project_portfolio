@@ -246,11 +246,11 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
   </details>
   
   <details>
-  <summary>장바구니 등록 코드 리뷰</summary>
+  <summary>장바구니 페이지 코드 리뷰</summary>
   <div markdown="1">
 
   ## Front-End
-  **요청**
+  **장바구니 등록**
   ```javascript
        const handleAddToCartOnClick = async () => {
         try {
@@ -280,16 +280,307 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         }
     }
   ```
+  - 
+  <br/>
+  
+  **장바구니 조회**
+  ```javascript
+       const getCartProducts = useQuery(["getCartProducts"], async () => {
+        try {
+            const option = {
+                headers: {
+                    Authorization: localStorage.getItem("accessToken")
+                }
+            }
+            const response = getCartApi(principal.data.data.userId, option);
+            return await response;
+        } catch(error) {
+            console.log(error)
+        }
+    }, {
+        refetchOnWindowFocus: false,
+        onSuccess: response => {
+            setCartProducts(!response?.data ? [] : response.data);
+        }
+    })
+  ```
+  - 
   <br/>
 
-  - accessToken이 있는 상태에서 장바구니를 등록할 수 있다.
-  - 장바구니에 상품을 등록시 로그인한 유저의 userId와 선택한 상품 및 상품 수량의 데이터가 Back-End로 넘어간다.
+  **장바구니 삭제**
+ ```javascript
+    const handleDeleteProductOnClick = async (index) => {
+        
+        if(window.confirm("선택하신 상품을 삭제하시겠습니까? ")) {
+            try {
+                const option = {
+                    headers: {
+                        Authorization: localStorage.getItem("accessToken")
+                    }
+                }
+
+                const response = await deleteCartApi(cartProducts[index].cartId, option);
+                if (response.data === true) {
+                    const deleteProduct = [...cartProducts]
+                    deleteProduct.splice(index, 1);
+                    setCartProducts(deleteProduct);
+                    window.location.reload();
+                } else {
+                    throw new Error("상품 삭제 실패")
+                }
+            } catch(error) {
+                console.log(error)
+            }
+        }else {
+            return;
+        }
+    }
+ ```
+  - 
+  <br/>
+
   
+  ## Back-End
+  **Controller**
+  ```java
+    // 장바구니 등록
+    @PostMapping("/api/cart/{userId}")
+    public ResponseEntity<?> addProductToCart(@PathVariable int userId, @RequestBody List<AddCartReqDto> addCartReqDto) {
+        return ResponseEntity.ok(cartService.addProductToCart(userId, addCartReqDto));
+    }
+
+    // 장바구니 조회
+    @GetMapping("/api/cart/{userId}")
+    public ResponseEntity<?> getCartByUserId(@PathVariable int userId) {
+        return ResponseEntity.ok(cartService.getCartByUserId(userId));
+    }
+
+    // 장바구니 삭제
+    @DeleteMapping("/api/cart/{cartId}")
+    public ResponseEntity<?> removeProductOfCart(@PathVariable int cartId) {
+        return ResponseEntity.ok(cartService.removeProductOfCart(cartId));
+    }
+  ```
+  -
+  <br/>
+
+  **Dto**
+  ```java
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  @Data
+  public class AddCartReqDto {
+      private int productDtlId;
+      private int count;
+  
+      public Cart toCartProductsEntity(int userid) {
+          return Cart.builder()
+                  .userId(userid)
+                  .productDtlId(productDtlId)
+                  .count(count)
+                  .build();
+      }
+  }
+  ```
+  -
+  ```java
+  @Data
+  @Builder
+  public class GetUserCartProductsRespDto {
+      private int cartId;
+      private int productDtlId;
+      private int count;
+  
+      private ProductDtl productDtl;
+  }
+  ```
+  -
+  <br/>
+
+  **Entity**
+  ```java
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  @Data
+  public class Cart {
+      private int cartId;
+      private int userId;
+      private int productDtlId;
+      private int count;
+  
+      private ProductDtl productDtl;
+  
+      public GetUserCartProductsRespDto toGetUserCartProductsRespDto() {
+          return GetUserCartProductsRespDto.builder()
+                  .cartId(cartId)
+                  .productDtlId(productDtlId)
+                  .count(count)
+                  .productDtl(productDtl)
+                  .build();
+      }
+  }
+  ```
+  -
+  <br/>
+
+  **Repository**
+  ```java
+
+  @Mapper
+  public interface CartMapper {
+    // 장바구니 등록
+    public int insertCart(Cart cart);
+
+    // 장바구니 조회
+    public List<Cart> selectCartByUserId(int userId);
+
+    // 장바구니 삭제
+    public int deleteProductOfCart(int cartId)
+  }
+  ```
+  -
+
+  <br/>
+  
+  **Service**
+  ```java
+    // 장바구니 등록
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean addProductToCart(int userId, List<AddCartReqDto> addCartReqDto) {
+        try {
+            return addCartReqDto.stream()
+                    .map(dto -> dto.toCartProductsEntity(userId))
+                    .map(cart -> cartMapper.insertCart(cart))
+                    .allMatch(successCount -> successCount == 1);
+        }catch (Exception e) {
+            throw new CartException
+                    (errorMapper.errorMapper("장바구니 오류", "상품을 장바구니에 담는 중 오류가 발생하였습니다."));
+        }
+    }
+
+    // 장바구니 조회
+    public List<GetUserCartProductsRespDto> getCartByUserId(int userId) {
+        try {
+            return cartMapper.selectCartByUserId(userId)
+                    .stream()
+                    .map(Cart::toGetUserCartProductsRespDto)
+                    .collect(Collectors.toList());
+        }catch (Exception e) {
+            throw new CartException
+                    (errorMapper.errorMapper("장바구니 오류", "장바구니를 불러오는 중 오류가 발생하였습니다."));
+        }
+    }
+
+    // 장바구니 삭제
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean removeProductOfCart(int cartId) {
+        try {
+            return cartMapper.deleteProductOfCart(cartId) > 0;
+        }catch (Exception e) {
+            throw new CartException
+                    (errorMapper.errorMapper("장바구니 오류", "장바구니에서 상품을 삭제하는 중 오류가 발생하였습니다."));
+        }
+    }
+  ```
+
+  **mapper(MyBatis)**
+  ```xml
+   <resultMap id="cartMap" type="com.woofnmeow.wnm_project_back.entity.Cart">
+        <id property="cartId" column="cart_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="productDtlId" column="product_dtl_id"/>
+        <result property="count" column="count"/>
+        <association property="productDtl" resultMap="productDtlMap"/>
+    </resultMap>
+
+    <resultMap id="productDtlMap" type="com.woofnmeow.wnm_project_back.entity.ProductDtl">
+        <id property="productDtlId" column="product_dtl_id" />
+        <result property="productMstId" column="product_mst_id" />
+        <result property="price" column="price" />
+        <result property="sizeId" column="size_id" />
+        <result property="actualStock" column="actual_stock" />
+        <result property="tempStock" column="temp_stock" />
+        <association property="productMst" resultMap="productMstMap"/>
+        <association property="size" resultMap="sizeMap"/>
+    </resultMap>
+
+    <resultMap id="productMstMap" type="com.woofnmeow.wnm_project_back.entity.ProductMst">
+        <id property="productMstId" column="product_mst_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="productCategoryId" column="product_category_id"/>
+        <result property="productDetailText" column="product_detail_text"/>
+        <result property="productThumbnailUrl" column="product_thumbnail_url"/>
+        <result property="productDetailUrl" column="product_detail_url"/>
+        <result property="createDate" column="create_date"/>
+        <association property="petType" resultMap="petTypeMap" />
+        <association property="category" resultMap="categoryMap" />
+    </resultMap>
+
+    <resultMap id="petTypeMap" type="com.woofnmeow.wnm_project_back.entity.PetType">
+        <id property="petTypeId" column="pet_type_id"/>
+        <result property="petTypeName" column="pet_type_name"/>
+    </resultMap>
+
+    <resultMap id="categoryMap" type="com.woofnmeow.wnm_project_back.entity.Category">
+        <id property="productCategoryId" column="product_category_id"/>
+        <result property="productCategoryName" column="product_category_name"/>
+    </resultMap>
+
+    <resultMap id="sizeMap" type="com.woofnmeow.wnm_project_back.entity.Size">
+        <id property="sizeId" column="size_id"/>
+        <result property="sizeName" column="size_name"/>
+    </resultMap>
+
+    <select id="selectCartByUserId" resultMap="cartMap">
+      select
+          ct.cart_id,
+          ct.count,
+          ct.user_id,
+          pdt.product_dtl_id,
+          pdt.price,
+          pmt.product_name,
+          pmt.product_thumbnail_url,
+          st.size_name,
+          psv.actual_stock,
+          psv.temp_stock
+      from
+          cart_tb ct
+          left outer join product_dtl_tb pdt on(pdt.product_dtl_id = ct.product_dtl_id)
+          left outer join product_mst_tb pmt on(pmt.product_mst_id = pdt.product_mst_id)
+          left outer join size_tb st on(st.size_id = pdt.size_id)
+          left outer join product_stock_view psv on(psv.product_dtl_id = pdt.product_dtl_id)
+      where
+          ct.user_id = #{user_id}
+    </select>
+  ```
+  -
+  <br/>
+  ```xml
+  <insert id="insertCart" parameterType="com.woofnmeow.wnm_project_back.entity.Cart" statementType="CALLABLE">
+      {call p_add_cart(#{userId}, #{productDtlId}, #{count})}
+  </insert>
+  ```
+  -
+  <br/>
+  ```xml
+    <delete id="deleteProductOfCart">
+        delete
+        from
+            cart_tb
+        where
+            cart_id = #{cartId}
+    </delete>
+  ```
+  -
+
+  <br/>
   </div>
   </details>
 
   <br/>
-
+  
 ### **구매 페이지**
   <details>
   <summary>상품 바로 구매 영상</summary>
