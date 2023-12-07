@@ -444,47 +444,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
 
   <br/>
   
-  **Service**
-  ```java
-    // 장바구니 등록
-    @Transactional(rollbackFor = Exception.class)
-    public Boolean addProductToCart(int userId, List<AddCartReqDto> addCartReqDto) {
-        try {
-            return addCartReqDto.stream()
-                    .map(dto -> dto.toCartProductsEntity(userId))
-                    .map(cart -> cartMapper.insertCart(cart))
-                    .allMatch(successCount -> successCount == 1);
-        }catch (Exception e) {
-            throw new CartException
-                    (errorMapper.errorMapper("장바구니 오류", "상품을 장바구니에 담는 중 오류가 발생하였습니다."));
-        }
-    }
-
-    // 장바구니 조회
-    public List<GetUserCartProductsRespDto> getCartByUserId(int userId) {
-        try {
-            return cartMapper.selectCartByUserId(userId)
-                    .stream()
-                    .map(Cart::toGetUserCartProductsRespDto)
-                    .collect(Collectors.toList());
-        }catch (Exception e) {
-            throw new CartException
-                    (errorMapper.errorMapper("장바구니 오류", "장바구니를 불러오는 중 오류가 발생하였습니다."));
-        }
-    }
-
-    // 장바구니 삭제
-    @Transactional(rollbackFor = Exception.class)
-    public Boolean removeProductOfCart(int cartId) {
-        try {
-            return cartMapper.deleteProductOfCart(cartId) > 0;
-        }catch (Exception e) {
-            throw new CartException
-                    (errorMapper.errorMapper("장바구니 오류", "장바구니에서 상품을 삭제하는 중 오류가 발생하였습니다."));
-        }
-    }
-  ```
-
+  
   **mapper(MyBatis)**
   ```xml
    <resultMap id="cartMap" type="com.woofnmeow.wnm_project_back.entity.Cart">
@@ -556,14 +516,14 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
     </select>
   ```
   -
-  <br/>
+  
   ```xml
   <insert id="insertCart" parameterType="com.woofnmeow.wnm_project_back.entity.Cart" statementType="CALLABLE">
       {call p_add_cart(#{userId}, #{productDtlId}, #{count})}
   </insert>
   ```
   -
-  <br/>
+  
   ```xml
     <delete id="deleteProductOfCart">
         delete
@@ -574,7 +534,49 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
     </delete>
   ```
   -
+  <br/>
+  
+  **Service**
+  ```java
+    // 장바구니 등록
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean addProductToCart(int userId, List<AddCartReqDto> addCartReqDto) {
+        try {
+            return addCartReqDto.stream()
+                    .map(dto -> dto.toCartProductsEntity(userId))
+                    .map(cart -> cartMapper.insertCart(cart))
+                    .allMatch(successCount -> successCount == 1);
+        }catch (Exception e) {
+            throw new CartException
+                    (errorMapper.errorMapper("장바구니 오류", "상품을 장바구니에 담는 중 오류가 발생하였습니다."));
+        }
+    }
 
+    // 장바구니 조회
+    public List<GetUserCartProductsRespDto> getCartByUserId(int userId) {
+        try {
+            return cartMapper.selectCartByUserId(userId)
+                    .stream()
+                    .map(Cart::toGetUserCartProductsRespDto)
+                    .collect(Collectors.toList());
+        }catch (Exception e) {
+            throw new CartException
+                    (errorMapper.errorMapper("장바구니 오류", "장바구니를 불러오는 중 오류가 발생하였습니다."));
+        }
+    }
+
+    // 장바구니 삭제
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean removeProductOfCart(int cartId) {
+        try {
+            return cartMapper.deleteProductOfCart(cartId) > 0;
+        }catch (Exception e) {
+            throw new CartException
+                    (errorMapper.errorMapper("장바구니 오류", "장바구니에서 상품을 삭제하는 중 오류가 발생하였습니다."));
+        }
+    }
+  ```
+  -
   <br/>
   </div>
   </details>
