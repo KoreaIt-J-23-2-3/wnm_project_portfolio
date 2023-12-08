@@ -28,7 +28,7 @@
 
 <br/>
 
-## **🏆 프로젝트 소개**
+## **🏆 프로젝트 소개** [[Notion]](https://marbled-teeth-f44.notion.site/Woof-Meow-Team-Project-5dff0bf505a144dfbb29f9942d010560)
 
 - 프로젝트 제목
   - 온라인 반려견 & 반려묘 쇼핑몰 "Woof&Meow" 웹 개발
