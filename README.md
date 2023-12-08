@@ -166,7 +166,7 @@
 ## **🔗 API명세서와 ERD설계도**
 
 ### API 명세서
-https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087df81eb43e899eaf11fa02d050c&pvs=4
+[https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087df81eb43e899eaf11fa02d050c&pvs=4](https://marbled-teeth-f44.notion.site/abb193ef34d84b8e9b0c63dc43a830ab?v=edb9cfe1930b4cf5a0b37853dd6df6f6&pvs=4)
 
 <br/>
 
