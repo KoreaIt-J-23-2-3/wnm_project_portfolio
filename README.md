@@ -218,6 +218,302 @@
   </details>
 <br/>
 
+  <details>
+  <summary>Oauth2로그인 및 회원가입 코드리뷰</summary>
+  <div markdown="1">
+  
+## Front-End
+**Oauth2 로그인**
+```javascript
+	const handleGoogleLogin = () => {
+			window.location.href = "http://localhost:8080/oauth2/authorization/google"
+	}
+
+	const handleKakaoLogin = () => {
+			window.location.href = "http://localhost:8080/oauth2/authorization/kakao"
+	}
+
+	const handleNaverLogin = () => {
+			window.location.href = "http://localhost:8080/oauth2/authorization/naver"
+	}
+```
+- 구글, 카카오, 네이버 간편 로그인을 구현
+<br>
+
+**Oauth2 로그인 토큰 저장**
+```javascript
+	const [ searchParams, setSearchParams ] = useSearchParams();
+	const queryClient = useQueryClient();
+	useEffect(() => {
+		if(!searchParams.get("token")) {
+				alert("정상적인 접근이 아닙니다.")
+				navigate("/")
+		} else {
+				localStorage.setItem("accessToken", "Bearer " + searchParams.get("token"));
+				queryClient.refetchQueries("getPrincipal");
+		}
+	}, []);
+
+	return <Navigate to={"/"}/>
+```
+- useEffect로 dependency에 아무것도 주지 않아서 이 컴포넌트에 접근했을때 한번만 코드가 실행되도록 함
+- Url에 파라미터로 토큰을 받아 localStorage에 accessToken이란 key로 Bearer 표시를 추가하여 토큰을 저장해주고 홈화면으로 보내줌
+
+<br>
+
+**Oauth2 로그인 후 회원가입**
+```javascript
+	const user = {
+        oauth2Id: searchParams.get("oauth2Id"),
+        provider: searchParams.get("provider"),
+        name: "",
+        nickname: "",
+        email: "",
+        phoneNumber: "",
+        defaultAddressNumber: 0,
+        defaultAddressName:"",
+        defaultAddressDetailName:""
+    }
+
+    useEffect(() => {
+        if(!searchParams.get("provider")){
+            alert("정상적인 접근이 아닙니다.")
+            navigate("/")
+        }
+    })
+
+    const [ signupUser, setSignupUser ] = useState(user);
+    
+    const handleInputChange = (e) => {
+        setSignupUser({
+            ...signupUser,
+            [e.target.name]: e.target.value
+        });
+    }
+
+    const handleSignupSubmit = async () => {
+        try {
+            await signupApi(signupUser);
+            alert("회원가입 완료");
+            window.location.replace("/auth/signin");
+        }catch(error) {
+            alert("회원가입 중 오류가 발생하였습니다.")
+        }
+    }
+
+    const handleCancelOnClick = () => {
+        navigate(-1)
+    }
+```
+- 간편 로그인 후 회원정보를 추가로 받아 DB에 저장하기 위해 구현
+- user객체에 정보를 담아 백앤드로 전달
+- 주소 정보는 Daum주소 Api를 사용, Oauth2Id와 Provider는 Bearer토큰에 담겨있는 정보를 가져옴, 나머지 정보는 인풋을 통해 저
+
+<br>
+
+## Back-End
+**Controller**
+```java
+	@ValidAop
+	@PostMapping("/api/auth/signup")
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupReqDto signupReqDto, BindingResult bindingResult) {
+        return ResponseEntity.ok().body(userService.signup(signupReqDto));
+	}
+```
+- 회원가입 요청을 받는 컨트롤러
+<br>
+
+**Dto**
+```java
+	@NotBlank
+	private String oauth2Id;
+	@NotBlank
+	private String provider;
+	@Email
+	private String email;
+	@Pattern(regexp = "^[가-힣]{2,6}$", message = "이름 형식을 다시 확인해주세요.")
+	private String name;
+	@NotBlank
+	private String nickname;
+	@Pattern(regexp = "^[0-9]{11}$", message = "전화번호를 다시 확인해주세요.")
+	private String phoneNumber;
+	@NotBlank
+	private String defaultAddressNumber;
+	@NotBlank
+	private String defaultAddressName;
+	@NotBlank
+	private String defaultAddressDetailName;
+
+	public User toEntity() {
+			return User.builder()
+							.oauth2Id(oauth2Id)
+							.provider(provider)
+							.email(email)
+							.name(name)
+							.nickname(nickname)
+							.phoneNumber(phoneNumber)
+							.defaultAddressNumber(defaultAddressNumber)
+							.defaultAddressName(defaultAddressName)
+							.defaultAddressDetailName(defaultAddressDetailName)
+							.build();
+	}
+```
+- 회원가입 Controller에서 받을 정보를 담을 Dto생성
+- 이름과 전화번호에만 정규식으로 유효성 검사, 이메일은 어노테이션을 사용해서 검사
+- repository에서 entity로 변환하기 위한 메소드 작성성
+<br>
+
+**Service**
+```java
+	@Transactional(rollbackFor = Exception.class)
+	public Boolean signup(SignupReqDto signupReqDto) {
+			try {
+					return userMapper.saveUser(signupReqDto.toEntity()) > 0;
+			}catch (Exception e) {
+					throw new SignupException
+									(errorMapper.errorMapper("회원가입 오류", "회원가입 중 오류가 발생하였습니다."));
+			}
+	}
+```
+- 회원가입 요청을 처리하는 서비스
+- 회원가입에서 발생하는 오류 처리
+<br>
+
+**Repository**
+```java
+	public Integer saveUser(User user);
+```
+- 회원 가입을 위한 메소드
+<br>
+
+**Entity**
+```java
+	private int userId;
+	private String roleName;
+	private String oauth2Id;
+	private String provider;
+	private String name;
+	private String nickname;
+	private String email;
+	private String phoneNumber;
+	private String defaultAddressNumber;
+	private String defaultAddressName;
+	private String defaultAddressDetailName;
+	private String profileUrl;
+```
+- Dto에서 변환하여 Repository에서 사용할 Entity
+<br>
+
+
+**Mapper**
+```java
+	<insert id="saveUser" parameterType="com.woofnmeow.wnm_project_back.entity.User">
+		insert into
+				user_tb
+		values(0,
+					'ROLE_USER',
+					#{oauth2Id},
+					#{provider},
+					#{name},
+					#{nickname},
+					#{email},
+					#{phoneNumber},
+					#{defaultAddressNumber},
+					#{defaultAddressName},
+					#{defaultAddressDetailName},
+					default)
+	</insert>
+```
+- 회원가입 insert문
+- 유저 권한을 기본적으로 USER로 넣어줌
+<br>
+
+**Config**
+```java
+	.and()
+	.oauth2Login()
+	.successHandler(oauth2SuccessHandler)
+	.userInfoEndpoint()
+	.userService(principalUserDetailsService);
+```
+- 간편로그인을 허용하기위해 필터에 코드 추가
+<br>
+
+**PrincipalUser**
+```java
+	@Getter
+	private User user;
+
+	public PrincipalUser(User user, Map<String, Object> attributes, String nameAttributeKey) {
+			super(null, attributes, nameAttributeKey);
+			this.user = user;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+			ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
+			authorities.add(new SimpleGrantedAuthority(user.getRoleName()));
+			return authorities;
+	}
+
+	@Override
+	public String getName() {
+			if(user.getProvider().equals("google")) {
+					return super.getAttributes().get("sub").toString();
+			} else {
+					return super.getAttributes().get("id").toString();
+			}
+	}
+```
+- Jwt토큰을 만들기위한 PrincipalUser객체
+- 카카오나 네이버와 달리 google의 경우 attributes에서 사용자 정보가 담긴 부분의 키값이 sub이기 때문에 getName을 사용할 때 조건이 필요
+<br>
+
+**successHandler**
+```java
+	@Override
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+			OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
+			OAuth2User oAuth2User = authenticationToken.getPrincipal();
+
+			String oauth2Id = oAuth2User.getName();
+			String provider = oAuth2User.getAttribute("provider") == null ? "google" : oAuth2User.getAttribute("provider").toString();
+
+			User user = userMapper.findUserByOauth2Id(oauth2Id);
+			
+			if(user == null) {
+					response.sendRedirect("http://localhost:3000/auth/signup" +
+									"?oauth2Id=" + oauth2Id +
+									"&provider=" + provider);
+					return;
+			}
+			PrincipalUser principalUser = new PrincipalUser(user, oAuth2User.getAttributes(), provider.equals("google") ? "sub" : "id");
+
+			String accessToken = jwtProvider.createToken(principalUser);
+			response.sendRedirect("http://localhost:3000/auth/oauth2/signin" +
+							"?token=" + URLEncoder.encode(accessToken, "UTF-8"));
+    }
+```
+- Jwt토큰에 간편로그인을 제공한 회사의 이름을 넣어주기 위해 provider를 추가
+- 회원가입한 사용자가 없을 경우 회원가입 화면으로 oauth2Id와 provider를 담아서 보내주었음
+- principal객체를 생성해서 Jwt토큰을 생성 후 로그인 화면으로 보내주었음 
+<br>
+
+**Controller**
+```java
+	.and()
+	.oauth2Login()
+	.successHandler(oauth2SuccessHandler)
+	.userInfoEndpoint()
+	.userService(principalUserDetailsService);
+```
+- 간편로그인을 허용하기위해 필터에 코드 추가
+<br>
+
+  </div>
+  </details>
+
+
 
 ### **상품 페이지**
   <details>
