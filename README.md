@@ -660,7 +660,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         }
     }
   ```
-  - 
+  - 선택한 상품과 isCart를 로컬스토리지에 담아서 구매페이지로 넘어간다.
   <br/>
 
   **장바구니 상품 구매**
@@ -687,14 +687,15 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         }
     }
   ```
-  - 
+  - 장바구니에 담겨있는 상품중 선택한 상품과 isCart를 로컬스토리지에 담아서 구매페이지로 넘어간다.
+  - 만약 선택한 상품의 재고가 부족하면 상품의 재고가 부족하다는 알림창을 띄워준다.
   <br/>
   
   **구매 페이지**
   ```javascript
     const [ buyProductList, setBuyProductList ] = useState(JSON.parse(localStorage.getItem("orderData")));
   ```
-  - 
+  - 로컬스토리지에 담아서 넘어온 상품 데이터를 useState로 상태를 관리한다.
   <br/>
 
   **구매 버튼(KakaoPay, TossPay)**
@@ -759,7 +760,9 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         });
     }
  ```
-  - 
+  - KakaoPay, TossPay 둘 중 하나를 선택하여 결제를 한다.
+  - 결제가 완료되면 구매할때 기입한 데이터들을 Axios를 통해 Back-End로 보내준다.
+  - 이때 로컬스토리지에 있는 isCart도 같이 보내준다.
   <br/>
 
   
@@ -771,7 +774,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         return ResponseEntity.ok().body(orderService.addOrder(addOrderReqDto));
     }
   ```
-  -
+  - Front-End에서 넘어온 데이터를 AddOrderReqDto로 받는 로직이다.
   <br/>
 
   **Dto**
@@ -802,7 +805,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
     }
 }
   ```
-  -
+  - Dto에는 구매시 기입한 데이터와 isCart가 있다.
+  - toOrderEntity는 Dto의 데이터를 Entity로 변환한다.
   <br/>
 
   **Entity**
@@ -815,7 +819,6 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       private int orderId;
       private int userId;
       private LocalDateTime orderDate;
-      private LocalDateTime orderUpdateDate;
       private String shippingName;
       private String shippingPhone;
       private String shippingAddressNumber;
@@ -823,7 +826,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       private String shippingAddressDetailName;
       private int orderStatus;
   ```
-  -
+  - Dto에서 변환한 데이터를 받는 Entity이다.
+  - DB의 테이블과 컬럼명이 동일하다.
   ```java
   @NoArgsConstructor
   @AllArgsConstructor
@@ -835,7 +839,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       private int productDtlId;
       private int count;
   ```
-  -
+  - Order Entity는 배송관련 데이터를 담는 Entity이면 OrderProducts는 구매 상품의 데이터를 담는 Entity이다.
   <br/>
   
   **Repository**
@@ -847,7 +851,7 @@ public interface OrderMapper {
     public Integer insertProductsToOrder(Map<String, Object> reqMap);
 }
   ```
-  -
+  - 주문을 추가하고 상품도 같이 추가되는 로직이다.
   
   ```java
 @Mapper
@@ -855,7 +859,7 @@ public interface CartMapper {
     public int deleteProductOfCartWhenIsCart(DeleteOrderCartVo deleteOrderCartVo);
 }
   ```
-  -
+  - 해당 로직은 장바구니의 상품을 구매할지 장바구니 들어있는 데이터를 삭제하는 로직이다.
   <br/>
   
   
@@ -865,10 +869,16 @@ public interface CartMapper {
         insert into
             order_tb
         values
-            (0, #{userId}, now(), now(), #{shippingName}, #{shippingPhone}, #{shippingAddressNumber}, #{shippingAddressName}, #{shippingAddressDetailName}, 0)
+            (0, #{userId}, now(), #{shippingName}, #{shippingPhone}, #{shippingAddressNumber}, #{shippingAddressName}, #{shippingAddressDetailName}, 0)
+    </insert>
+
+    <insert id="insertProductsToOrder" parameterType="hashmap">
+        insert into
+            order_products_tb
+        values(0, #{orderId}, #{productDtlId}, #{count})
     </insert>
   ```
-  -
+  - DB에 결제시 배송관련 데이터와 구매 상품 관련 데이터를 추가하는 SQL쿼리문이다.
   
   ```xml
     <delete id="deleteProductOfCartWhenIsCart">
@@ -884,7 +894,7 @@ public interface CartMapper {
         )
     </delete>
   ```
-  -
+  - 로그인한 userId를 통해 장바구니에 있는 상품 목록을 삭제하는 SQL쿼리문이다.
   <br/>
 
   **Vo**
@@ -896,7 +906,7 @@ public interface CartMapper {
       private List<Integer> products;
   }
   ```
-  -
+  - 장바구니 상품을 구매할시 삭제할 상품의 데이터만 삭제하려고 VO를 사용했다.
   <br/>
   
   **Service**
@@ -924,7 +934,9 @@ public interface CartMapper {
         }
     }
   ```
-  -
+  - insertOrder에는 Order 배송관련 데이터를 넣는다.
+  - insertProductsToOrder에는 Dto안에 있는 getOrderProductData를 반복문을 돌려서 데이터를 넣는다.
+  - 만약 Dto안에 있는 isCart가 True이면 장바구니에 있는 상품 데이터를 삭제한다.
   <br/>
   
   </div>
