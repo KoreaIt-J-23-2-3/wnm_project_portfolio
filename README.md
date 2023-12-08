@@ -216,7 +216,6 @@
   
   </div>
   </details>
-<br/>
 
   <details>
   <summary>Oauth2로그인 및 회원가입 코드리뷰</summary>
@@ -512,7 +511,7 @@
 
   </div>
   </details>
-
+<br>
 
 
 ### **상품 페이지**
