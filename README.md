@@ -280,7 +280,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         }
     }
   ```
-  - 
+  - 로그인(accessToken) 상태에서 장바구니 등록이 가능하다
+  - selectProduct 안에는 상품의 상세ID와 상품 수량의 데이터가 들어가 있다.
   <br/>
   
   **장바구니 조회**
@@ -304,7 +305,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         }
     })
   ```
-  - 
+  - React-Query를 사용하여 장바구니 상품 조회를 할 수 있다.
+  - 해당 로그인한 userId만 조회가 가능하다.
   <br/>
 
   **장바구니 삭제**
@@ -336,7 +338,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         }
     }
  ```
-  - 
+  - 장바구니 페이지에서 해당 로그인한 userId만 삭제가 가능하다.
   <br/>
 
   
@@ -361,7 +363,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         return ResponseEntity.ok(cartService.removeProductOfCart(cartId));
     }
   ```
-  -
+  - 장바구니 등록 같은 경우 List형태로 올수가 있어 List로 데이터를 받는다
   <br/>
 
   **Dto**
@@ -383,7 +385,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       }
   }
   ```
-  -
+  - Dto는 상품의 상세ID와 상품 수량의 데이터만 받고 Builder를 통해 Entity로 변환한다.
+  - userId는 로그인한 회원의 userId를 넣는다.
   ```java
   @Data
   @Builder
@@ -395,7 +398,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       private ProductDtl productDtl;
   }
   ```
-  -
+  - 장바구니 조회는 장바구니ID와 상품상세ID, 상품수량 그리고 상품상세에 대한 Entity의 데이터를 Front로 보내준다.
   <br/>
 
   **Entity**
@@ -422,7 +425,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       }
   }
   ```
-  -
+  - Entity에서 ResponseDto로 변환하는 로직이다.
   <br/>
 
   **Repository**
@@ -440,8 +443,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
     public int deleteProductOfCart(int cartId)
   }
   ```
-  -
-
+  - Mapper를 통해서 DB(MyBatis)와 매핑해주는 역할
   <br/>
   
   
@@ -515,7 +517,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
           ct.user_id = #{user_id}
     </select>
   ```
-  -
+  - 조회는 resultMap를 사용해서 상품의 정보를 가져올 수 있도록 하였다.
   
   ```xml
   <insert id="insertCart" parameterType="com.woofnmeow.wnm_project_back.entity.Cart" statementType="CALLABLE">
@@ -551,7 +553,8 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
       end if;
   END
   ```
-  -
+  - 장바구니 등록 SQL 쿼리문은 같은 상품을 등록할시 수량만 올라갈 수 있도록 하여 프로시져를 사용하였다.
+  - 없는 상품이면 insert / 있는 상품이면 update 
   
   ```xml
     <delete id="deleteProductOfCart">
@@ -562,7 +565,7 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
             cart_id = #{cartId}
     </delete>
   ```
-  -
+  - 장바구니 상품을 삭제하는 SQL 쿼리문 이다.
   <br/>
   
   **Service**
@@ -605,7 +608,9 @@ https://marbled-teeth-f44.notion.site/c214f75ad9754971b2a3bfb30026b037?v=80d087d
         }
     }
   ```
-  -
+  - 장바구니 등록 : 로그인한 userId와 상품 정보를 이용하여 장바구니에 등록하고 둘다 successCount가 1이면 성공, 실패시 롤백과 예외처리를 던진다.
+  - 장바구니 조회 : 로그인한 userId로 조회를 하고 각 상품을 ResponseDto를 List로 반환한다.
+  - 장바구니 삭제 : 장바구니 ID로 해당되는 상품을 삭제한다. 실패시 롤백과 예외처리를 던진다.
   <br/>
   </div>
   </details>
