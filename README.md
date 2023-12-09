@@ -310,7 +310,7 @@
 
 <br>
 
-## Back-End
+##Back-End
 **Controller**
 ```java
 	@ValidAop
@@ -403,9 +403,8 @@
 - Dto에서 변환하여 Repository에서 사용할 Entity
 <br>
 
-
 **Mapper**
-```java
+```xml
 	<insert id="saveUser" parameterType="com.woofnmeow.wnm_project_back.entity.User">
 		insert into
 				user_tb
@@ -1278,6 +1277,550 @@ public interface CartMapper {
   <div markdown="1">
 
 ![공지사항 페이지](https://github.com/KoreaIt-J-23-2-3/wnm_project_portfolio/assets/137989661/7d0a4b2e-487f-4b12-b05a-6091bb30d2f4)
+
+  </div>
+  </details>
+
+  <details>
+  <summary>공지사항 페이지 코드리뷰</summary>
+  <div markdown="1">
+
+###Frontend
+**전체 공지사항 페이지**
+```javascript
+	const [ announcementsList, setAnnouncementsList ] = useState([]);
+	const [ announcementsCount, setAnnouncementsCount ] = useState([]);
+	const [ searchData, setSearchData ] = useState({
+		petTypeName: "all",
+		productCategoryName: "all",
+		searchOption: 'all',
+		searchValue: '',
+		sortOption: 'number',
+		pageIndex: 1});
+			
+	const getAnnouncements = useQuery(["getAnnouncements"], async () => {
+		try {
+				const response = await getAnnouncementsApi();
+				return  response;
+		} catch (error) {
+				console.log(error)
+		}   
+	},{
+		retry: 0,
+		onSuccess: response => {
+				setAnnouncementsList(response?.data);
+		}
+	})
+
+	const getAnnouncementsCount = useQuery(["getAnnouncementsCount"], async () => {
+		try {
+				const response = await getAnnouncementsCountApi();
+				return  response;
+		} catch (error) {
+				console.log(error)
+		}   
+	},{
+		retry: 0,
+		onSuccess: response => {
+				setAnnouncementsCount(response?.data);
+		}
+	})
+
+	const handleAnnouncementClick = (announcementId) => {
+		navigate(`/notice/${announcementId}`)
+	}
+```
+- getAnnouncements 리엑트쿼리로 공지사항 리스트를 가져옴, 데이터를 가져오는데 성공하면 announcementsList상태에 데이터를 저장
+- getAnnouncementsCount 리엑트 쿼리로 페이지네이션에 필요한 공지사항의 전체 갯수를 가져옴
+- 전체 공지사항에서 특정 공지사항을 클릭하면 announcementId를 가지고 이동
+<br>
+
+**공지사항 작성**
+```javascript
+	const [ announcementData, setAnnouncementData ]= useState({
+		title: "",
+		content: "",
+		type: "공지사항",
+		isPinned: 0,
+		createDate: ""
+	});
+
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setAnnouncementData({
+				...announcementData,
+				[name]: value
+		})
+	}
+
+	const handleCheckBoxChange = (e) => {
+		setAnnouncementData({
+				...announcementData,
+				isPinned: announcementData.isPinned === 0 ? 1 : 0
+		});
+	}
+
+	useEffect(() => {
+		if(principal?.data?.data.roleName !== "ROLE_ADMIN" || !principal?.data) {
+				alert("정상적인 접근이 아닙니다.")
+				navigate("/")
+		}
+	}, [])
+
+	const handleWriteClick = async () => {
+		try {
+				const option = {
+						headers: {
+								Authorization: localStorage.getItem("accessToken")
+						}
+				}
+				const response = await writeAnnouncementApi(announcementData, option)
+		
+				alert("등록이 완료되었습니다.")
+				navigate("/notice")
+				return response;
+		} catch (error) {
+				alert(error)
+		}
+	}
+```
+- isPinned의 경우 작성 시 전체 공지사항에서 상단에 고정 여부를 체크박스를 통해 선택가능
+- useEffect를 통해 관리자 권한이 없는 사용자가 접근 할 경우 홈 화면으로 돌려보내줍니다
+- type의 경우 카테고리가 늘어날 경우를 대비하여 작
+<br>
+
+**공지사항 상세페이지**
+```javascript
+	const [ announcementData, setAnnouncementData ] = useState();
+
+	const getAnnouncementById = useQuery(["getAnnouncementById", announcementData], async () => {
+		try {
+				const response = await getAnnouncementByIdApi(announcementId);
+				return response;
+		} catch (error) {
+				console.log(error)
+		}
+	},
+	{
+		retry: 0,
+		onSuccess: response => {
+				setAnnouncementData(response.data)
+		}
+	})
+
+	if(getAnnouncementById.isLoading) {
+		return <div>로딩중</div>
+	}
+
+		const handleEditClick = (announcementDataId) => {
+		navigate(`/admin/edit/announcement/${announcementDataId}`)
+	}
+
+	const handleDeleteClick = async (announcementDataId) => {
+		if(window.confirm("삭제 하시겠습니까?")) {
+				try {
+						const option = {
+								headers: {
+										Authorization: localStorage.getItem("accessToken")
+								}
+						}
+						const response = await deleteAnnouncementApi(announcementDataId, option);
+						alert("삭제가 완료되었습니다.")
+						return response;
+				} catch (error) {
+						alert(error.message)
+				}   
+		}
+	}
+
+	const HandleCancle = () => {
+		navigate(-1)
+	}
+```
+- 공지사항의 데이터를 가져오는데 성공하면 announcementData상태에 데이터를 저장
+- 수정과 삭제 버튼은 관리자인 경우에만 보이도록 해줌줌
+<br>
+
+**공지사항 수정**
+```javascript
+	const [ announcementData, setAnnouncementData ]= useState({
+		title: "",
+		content: "",
+		isPinned: 0,
+		createDate: ""
+	});
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await getAnnouncementByIdApi(announcementId);
+				setAnnouncementData({
+						title: response?.data?.title,
+						content: response?.data?.content,
+						isPinned: response?.data?.isPinned,
+						createDate: response?.data?.createDate,
+				});
+			} catch (error) {
+					console.error(error);
+			}
+		};
+		fetchData();
+	}, [announcementId])
+
+	const handleCheckBoxChange = () => {
+		setAnnouncementData({
+				...announcementData,
+				isPinned: announcementData.isPinned === 0 ? 1 : 0
+		});
+	}
+
+	useEffect(() => {
+			if(principal?.data?.data.roleName !== "ROLE_ADMIN" || !principal?.data) {
+					alert("정상적인 접근이 아닙니다.")
+					navigate("/")
+			}
+	}, [])
+
+	const handleInputChange = (e) => {
+			const { name, value } = e.target;
+			setAnnouncementData({
+					...announcementData,
+					[name]: value
+			})
+	}
+
+	const handleEditClick = async () => {
+		try {
+			const option = {
+					headers: {
+							Authorization: localStorage.getItem("accessToken")
+					}
+			}
+			const response = await editAnnouncementApi(announcementId, announcementData, option);
+			alert("수정이 완료되었습니다.");
+			navigate("/notice");
+
+			return response;
+		} catch (error) {
+				alert(error)
+		}
+	}
+```
+- 제목과 내용 고정여부를 수정 가능
+- 수정하기 위한 공지사항의 데이터를 가져오는데 성공하면 announcementData상태에 저장
+- useEffect를 통해 관리자 권한이 없는 사용자가 접근 할 경우 홈 화면으로 돌려보내줍니다
+<br>
+
+###Backend
+**공지사항 Controller**
+```java
+	@PostMapping("/api/admin/announcement")
+	public ResponseEntity<?> addAnnouncement(@RequestBody AddAnnouncementReqDto addAnnouncementReqDto) {
+			return ResponseEntity.ok(announcementService.addAnnouncement(addAnnouncementReqDto));
+	}
+```
+- 공지사항 작성 요청을 받는 controller
+<br>
+
+```java
+	@GetMapping("/api/announcement/all")
+	public ResponseEntity<?> getAllAnnouncement() {
+			List<GetAnnouncementRespDto> response =  announcementService.getAllAnnouncement();
+			return ResponseEntity.ok(response);
+	}
+```
+- 전체 공지사항에 대한 요청을 받는 controller
+<br>
+
+```java
+	@GetMapping("/api/announcement/count")
+	public int getAnnouncementCount() {
+			return announcementService.getAnnouncementCount();
+	}
+```
+- 공지사항 전체 갯수에 대한 요청을 받는 controller
+<br>
+
+```java
+	@GetMapping("/api/announcement/{announcementId}")
+	public ResponseEntity<?> getAnnouncementById(@PathVariable int announcementId) {
+			return ResponseEntity.ok(announcementService.getAnnouncementById(announcementId));
+	}
+```
+- 특정 공지사항에 대한 요청을 받는 controller
+<br>
+
+```java
+	@PutMapping("/api/admin/announcement/{announcementId}")
+	public ResponseEntity<?> editAnnouncement(@PathVariable int announcementId,@RequestBody EditAnnouncementReqDto editAnnouncementReqDto) {
+			return ResponseEntity.ok(announcementService.editAnnouncement(announcementId, editAnnouncementReqDto));
+	}
+```
+- 특정 공지사항 수정 요청을 받는 controller
+<br>
+
+```java
+	@DeleteMapping("/api/admin/announcement/{announcementId}")
+	public ResponseEntity<?> deleteAnnouncement(@PathVariable int announcementId) {
+			return ResponseEntity.ok(announcementService.deleteAnnouncement(announcementId));
+	}
+```
+- 특정 공지사항 삭제 요청을 받는 controller
+<br>
+
+**공지사항 ReqDto**
+```java
+public class AddAnnouncementReqDto {
+	private String title;
+	private String content;
+	private String type;
+	private int isPinned;
+}
+
+public class EditAnnouncementReqDto {
+	private int announcementId;
+	private String title;
+	private String content;
+	private int isPinned;
+
+	public Announcement toEntity(int announcementId) {
+		return Announcement.builder()
+						.announcementId(announcementId)
+						.title(title)
+						.content(content)
+						.isPinned(isPinned)
+						.build();
+	}
+}
+```
+- 작성시 사용하는 Dto와 수정 시 사용하는 Dto이다.
+- 작성시간은 mapper에서 sql문에서 추가해주었다.
+- 수정의 경우 entity로 변환해주기 위한 메소드를 추가해주었다.
+<br>
+
+**공지사항 RespDto**
+```java
+public class GetAnnouncementRespDto {
+	private int announcementId;
+	private String title;
+	private String content;
+	private int isPinned;
+	private String createDate;
+}
+```
+- 특정 공지사항의 데이터를 반환할 때 사용하는 Dto이다.
+<br>
+
+**공지사항 Service**
+```java
+    public boolean addAnnouncement(AddAnnouncementReqDto addAnnouncementReqDto) {
+        try {
+            return announcementMapper.addAnnouncement(addAnnouncementReqDto) > 0;
+        }catch (Exception e) {
+            throw new AnnouncementExcption
+                    (errorMapper.errorMapper("공지사항", "공지사항 생성 중 오류가 발생하였습니다"));
+        }
+    }
+```
+- 공지사항 작성을 위한 부분.
+<br>
+
+```java
+    public List<GetAnnouncementRespDto> getAllAnnouncement() {
+        try {
+            return announcementMapper.getAllAnnouncement()
+                    .stream()
+                    .map(Announcement::toGetAnnouncementRespDto)
+                    .collect(Collectors.toList());
+        }catch (Exception e) {
+            throw new AnnouncementExcption
+                    (errorMapper.errorMapper("공지사항", "공지사항 조회 중 오류가 발생하였습니다."));
+        }
+    }
+```
+- 전체 공지사항을 리스트로 반환.
+<br>
+
+```java
+    public int getAnnouncementCount() {
+        try {
+            return announcementMapper.getAnnouncementCount();
+        }catch (Exception e) {
+            throw new AnnouncementExcption
+                    (errorMapper.errorMapper("공지사항", "공지사항 갯수 조회 중 오류가 발생하였습니다."));
+        }
+    }
+```
+- 공지사항의 전체 갯수를 반환.
+<br>
+
+```java
+    public GetAnnouncementRespDto getAnnouncementById(int announcementId) {
+        try {
+            return announcementMapper.getAnnouncementById(announcementId).toGetAnnouncementRespDto();
+        }catch (Exception e) {
+            throw new AnnouncementExcption
+                    (errorMapper.errorMapper("공지사항", "공지사항 조회 중 오류가 발생하였습니다."));
+        }
+    }
+```
+- 특정 공지사항의 데이터를 반환.
+<br>
+
+```java
+    @Transactional(rollbackFor = Exception.class)
+    public boolean editAnnouncement(int announcementId, EditAnnouncementReqDto editAnnouncementReqDto) {
+        try {
+            return announcementMapper
+                    .editAnnouncement(announcementId, editAnnouncementReqDto.toEntity(announcementId)) > 0;
+        }catch (Exception e) {
+            throw new AnnouncementExcption
+                    (errorMapper.errorMapper("공지사항", "공지사항 수정 중 오류가 발생하였습니다."));
+        }
+
+    }
+```
+- 특정 공지사항의 수정 결과를 반환.
+<br>
+
+```java
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAnnouncement(int announcementId) {
+        try {
+            return announcementMapper.deleteAnnouncement(announcementId) > 0;
+        }catch (Exception e) {
+            throw new AnnouncementExcption
+                    (errorMapper.errorMapper("공지사항", "공지사항 삭제 중 오류가 발생하였습니다."));
+        }
+    }
+```
+- 특정 공지사항의 삭제 결과를 반환.
+<br>
+
+**공지사항 Entity**
+```java
+public class Announcement {
+	private int announcementId;
+	private String title;
+	private String content;
+	private int isPinned;
+	private String createDate;
+
+	public GetAnnouncementRespDto toGetAnnouncementRespDto() {
+			return GetAnnouncementRespDto.builder()
+							.announcementId(announcementId)
+							.title(title)
+							.content(content)
+							.isPinned(isPinned)
+							.createDate(createDate)
+							.build();
+	}
+}
+```
+- respDto로 변환하는 메소드를 추가해주었다.
+<br>
+
+**공지사항 Repository**
+```java
+	public int addAnnouncement(AddAnnouncementReqDto addAnnouncementReqDto);
+	public List<Announcement> getAllAnnouncement();
+	public int getAnnouncementCount();
+	public Announcement getAnnouncementById(int announcementId);
+	public int editAnnouncement(int announcementId, Announcement announcement);
+	public int deleteAnnouncement(int announcementId);
+```
+-
+<br>
+
+**공지사항 Mapper**
+```xml
+	<insert id="addAnnouncement" parameterType="com.woofnmeow.wnm_project_back.dto.request.AddAnnouncementReqDto">
+		insert into
+				announcement_tb
+		values(0, #{title}, #{content}, #{type}, #{isPinned}, now())
+	</insert>
+```
+- 공지사항 작성을 위한 mabatis 쿼리문
+- 쿼리문으로 작성 당시의 시간을 넣어줌
+<br>
+
+```xml
+	<select id="getAllAnnouncement" resultType="com.woofnmeow.wnm_project_back.entity.Announcement">
+		select
+				announcement_id,
+				title,
+				content,
+				is_pinned,
+				create_date
+		from
+				announcement_tb
+		order by
+				is_pinned desc
+		limit
+		0, 10;
+	</select>
+```
+- 전체 공지사항을 가져오는 mybatis 쿼리문
+- 10개씩 보여주기 위해 limit를 걸어주었다.
+<br>
+
+```xml
+	<select id="getAnnouncementCount" resultType="java.lang.Integer">
+		select
+				count(*)
+		from
+				announcement_tb
+	</select>
+```
+- 페이지네이션을 위해 전체 공지사항 갯수를 가져오는 mybatis 쿼리문
+<br>
+
+```xml
+	<select id="getAnnouncementById"
+				parameterType="int"
+				resultType="com.woofnmeow.wnm_project_back.entity.Announcement">
+		select
+				announcement_id,
+				title,
+				content,
+				is_pinned,
+				create_date
+		from
+				announcement_tb
+		where
+				announcement_id = #{announcementId}
+	</select>
+```
+- 특정 공지사항Id로 데이터를 가져오는 mybatis 쿼리문
+<br>
+
+```xml
+	<update id="editAnnouncement" parameterType="com.woofnmeow.wnm_project_back.entity.Announcement">
+			update
+					announcement_tb
+			set
+					title = #{announcement.title},
+					content = #{announcement.content},
+					is_pinned = #{announcement.isPinned},
+					create_date = now()
+			where
+					announcement_id = #{announcementId};
+	</update>
+```
+- 공지사항을 수정하는 mybatis 쿼리문
+- 쿼리문으로 수정 당시의 시간을 넣어줌
+<br>
+
+```xml
+	<delete id="deleteAnnouncement" parameterType="int">
+			delete from
+					announcement_tb
+			where
+					announcement_id = #{announcementId}
+	</delete>
+```
+- 공지사항을 삭제하는 mybatis쿼리문
+<br>
 
   </div>
   </details>
