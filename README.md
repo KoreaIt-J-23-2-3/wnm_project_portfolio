@@ -310,7 +310,7 @@
 
 <br>
 
-##Back-End
+## Back-End
 **Controller**
 ```java
 	@ValidAop
@@ -1285,7 +1285,7 @@ public interface CartMapper {
   <summary>공지사항 페이지 코드리뷰</summary>
   <div markdown="1">
 
-###Frontend
+## Front-End
 **전체 공지사항 페이지**
 ```javascript
 	const [ announcementsList, setAnnouncementsList ] = useState([]);
@@ -1511,7 +1511,7 @@ public interface CartMapper {
 - useEffect를 통해 관리자 권한이 없는 사용자가 접근 할 경우 홈 화면으로 돌려보내줍니다
 <br>
 
-###Backend
+## Back-End
 **공지사항 Controller**
 ```java
 	@PostMapping("/api/admin/announcement")
