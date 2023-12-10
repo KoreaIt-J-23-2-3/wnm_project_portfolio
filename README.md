@@ -263,46 +263,46 @@
 **Oauth2 로그인 후 회원가입**
 ```javascript
 	const user = {
-        oauth2Id: searchParams.get("oauth2Id"),
-        provider: searchParams.get("provider"),
-        name: "",
-        nickname: "",
-        email: "",
-        phoneNumber: "",
-        defaultAddressNumber: 0,
-        defaultAddressName:"",
-        defaultAddressDetailName:""
-    }
+		oauth2Id: searchParams.get("oauth2Id"),
+		provider: searchParams.get("provider"),
+		name: "",
+		nickname: "",
+		email: "",
+		phoneNumber: "",
+		defaultAddressNumber: 0,
+		defaultAddressName:"",
+		defaultAddressDetailName:""
+	}
 
-    useEffect(() => {
-        if(!searchParams.get("provider")){
-            alert("정상적인 접근이 아닙니다.")
-            navigate("/")
-        }
-    })
+	useEffect(() => {
+		if(!searchParams.get("provider")){
+			alert("정상적인 접근이 아닙니다.")
+			navigate("/")
+		}
+	})
 
-    const [ signupUser, setSignupUser ] = useState(user);
-    
-    const handleInputChange = (e) => {
-        setSignupUser({
-            ...signupUser,
-            [e.target.name]: e.target.value
-        });
-    }
+	const [ signupUser, setSignupUser ] = useState(user);
+	
+	const handleInputChange = (e) => {
+		setSignupUser({
+			...signupUser,
+			[e.target.name]: e.target.value
+		});
+	}
 
-    const handleSignupSubmit = async () => {
-        try {
-            await signupApi(signupUser);
-            alert("회원가입 완료");
-            window.location.replace("/auth/signin");
-        }catch(error) {
-            alert("회원가입 중 오류가 발생하였습니다.")
-        }
-    }
+	const handleSignupSubmit = async () => {
+		try {
+			await signupApi(signupUser);
+			alert("회원가입 완료");
+			window.location.replace("/auth/signin");
+		}catch(error) {
+			alert("회원가입 중 오류가 발생하였습니다.")
+		}
+	}
 
-    const handleCancelOnClick = () => {
-        navigate(-1)
-    }
+	const handleCancelOnClick = () => {
+		navigate(-1)
+	}
 ```
 - 간편 로그인 후 회원정보를 추가로 받아 DB에 저장하기 위해 구현
 - user객체에 정보를 담아 백앤드로 전달
@@ -344,17 +344,17 @@
 	private String defaultAddressDetailName;
 
 	public User toEntity() {
-			return User.builder()
-							.oauth2Id(oauth2Id)
-							.provider(provider)
-							.email(email)
-							.name(name)
-							.nickname(nickname)
-							.phoneNumber(phoneNumber)
-							.defaultAddressNumber(defaultAddressNumber)
-							.defaultAddressName(defaultAddressName)
-							.defaultAddressDetailName(defaultAddressDetailName)
-							.build();
+		return User.builder()
+						.oauth2Id(oauth2Id)
+						.provider(provider)
+						.email(email)
+						.name(name)
+						.nickname(nickname)
+						.phoneNumber(phoneNumber)
+						.defaultAddressNumber(defaultAddressNumber)
+						.defaultAddressName(defaultAddressName)
+						.defaultAddressDetailName(defaultAddressDetailName)
+						.build();
 	}
 ```
 - 회원가입 Controller에서 받을 정보를 담을 Dto생성
