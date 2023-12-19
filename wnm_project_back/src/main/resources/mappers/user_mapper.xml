@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woofnmeow.wnm_project_back.repository.UserMapper">
+
+    <!--  resultMap  -->
+
+    <resultMap id="userMap" type="com.woofnmeow.wnm_project_back.entity.User">
+        <id property="userId" column="user_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="oauth2Id" column="oauth2_id"/>
+        <result property="provider" column="provider"/>
+        <result property="nickname" column="nickname"/>
+        <result property="email" column="email"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="defaultAddressNumber" column="default_address_number"/>
+        <result property="defaultAddressName" column="default_address_name"/>
+        <result property="defaultAddressDetailName" column="default_address_detail_name"/>
+        <result property="profileUrl" column="profile_url"/>
+    </resultMap>
+
+    <!--  resultMap  -->
+
+
+
+
+
+
+
+
+
+    <!--  Insert  -->
+
+    <!-- 정보 등록 -->
+    <insert id="saveUser" parameterType="com.woofnmeow.wnm_project_back.entity.User">
+        insert into
+            user_tb
+        values(0, 'ROLE_USER', #{oauth2Id}, #{provider},
+                #{name}, #{nickname}, #{email}, #{phoneNumber},
+                #{defaultAddressNumber}, #{defaultAddressName}, #{defaultAddressDetailName}, default)
+    </insert>
+
+
+    <!--  Insert  -->
+
+
+
+
+
+
+
+
+
+
+
+    <!--  select  -->
+
+    <!-- Oauth2 회원 정보 검색 -->
+    <select id="findUserByOauth2Id" resultMap="userMap">
+        select
+            user_id,
+            role_name,
+            oauth2_id,
+            provider,
+            name,
+            nickname,
+            email,
+            phone_number,
+            default_address_number,
+            default_address_name,
+            default_address_detail_name,
+            profile_url
+        from
+            user_tb
+        where
+            oauth2_id = #{oauth2Id}
+    </select>
+
+
+    <!-- userId 회원 정보 검색 -->
+    <select id="findUserByUserId" resultMap="userMap">
+        select
+            user_id,
+            role_name,
+            oauth2_id,
+            provider,
+            name,
+            nickname,
+            email,
+            phone_number,
+            default_address_number,
+            default_address_name,
+            default_address_detail_name,
+            profile_url
+        from
+            user_tb
+        where
+            user_id = #{userId}
+    </select>
+
+
+    <!-- 전체 및 검색 회원 정보 검색 -->
+    <select id="getUserList" resultMap="userMap">
+        select
+            user_id,
+            role_name,
+            oauth2_id,
+            provider,
+            name,
+            nickname,
+            email,
+            phone_number,
+            default_address_number,
+            default_address_name,
+            default_address_detail_name,
+            profile_url
+        from
+            user_tb
+        where
+            1 = 1
+        <choose>
+            <when test="searchOption.equals('name')">
+                and name like concat("%", #{searchValue}, "%")
+            </when>
+            <when test="searchOption.equals('number')">
+                <if test="!searchValue.equals('')">
+                    and phone_number = #{searchValue}
+                </if>
+            </when>
+            <otherwise>
+                and (name like concat("%", #{searchValue}, "%")
+                    or phone_number = #{searchValue})
+            </otherwise>
+        </choose>
+        order by
+            user_id asc
+    </select>
+
+    <select id="getUserCount" resultType="java.lang.Integer" parameterType="hashmap">
+        select
+            count(*)
+        from
+            user_tb
+        where
+            1 = 1
+        <choose>
+            <when test="searchOption.equals('name')">
+                and name like concat("%", #{searchValue}, "%")
+            </when>
+            <when test="searchOption.equals('number')">
+                <if test="!searchValue.equals('')">
+                    and phone_number = #{searchValue}
+                </if>
+            </when>
+            <otherwise>
+                and (name like concat("%", #{searchValue}, "%")
+                or phone_number = #{searchValue})
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--  select  -->
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--  update  -->
+
+    <!-- userId 회원 정보 수정 -->
+    <update id="editUser" parameterType="com.woofnmeow.wnm_project_back.entity.User">
+        update user_tb
+        set
+            nickname = #{nickname},
+            phone_number = #{phoneNumber},
+            default_address_number = #{defaultAddressNumber},
+            default_address_name = #{defaultAddressName},
+            default_address_detail_name = #{defaultAddressDetailName},
+            profile_url = #{profileUrl}
+        where
+            user_id = #{userId}
+    </update>
+    <!-- userId 회원 정보 삭제 -->
+
+    <!--  update  -->
+
+
+
+
+
+
+    <!--  delete  -->
+
+    <delete id="deleteUser">
+        delete
+        from
+            user_tb
+        where
+            user_id = #{userId}
+    </delete>
+
+    <!--  delete  -->
+
+</mapper>

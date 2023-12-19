@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woofnmeow.wnm_project_back.repository.OrderMapper">
+
+    <!--  resultMap  -->
+
+    <resultMap id="ordersMap" type="com.woofnmeow.wnm_project_back.entity.Order">
+        <id property="orderId" column="order_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="orderUpdateDate" column="order_update_date" />
+        <result property="shippingName" column="shipping_name"/>
+        <result property="shippingPhone" column="shipping_phone"/>
+        <result property="shippingAddressNumber" column="shipping_address_number"/>
+        <result property="shippingAddressName" column="shipping_address_name"/>
+        <result property="shippingAddressDetailName" column="shipping_address_detail_name"/>
+        <result property="orderStatus" column="order_status"/>
+        <collection property="orderProducts" javaType="List" resultMap="orderProductsMap"/>
+    </resultMap>
+
+    <resultMap id="orderProductsMap" type="com.woofnmeow.wnm_project_back.entity.OrderProducts">
+        <id property="orderProductsId" column="order_products_id"/>
+        <result property="productDtlId" column="product_dtl_id"/>
+        <result property="count" column="count"/>
+        <association property="productDtl" resultMap="productDtlMap"/>
+        <association property="review" resultMap="reviewMap" />
+    </resultMap>
+
+    <resultMap id="productDtlMap" type="com.woofnmeow.wnm_project_back.entity.ProductDtl">
+        <id property="productDtlId" column="product_dtl_id" />
+        <result property="productMstId" column="product_mst_id" />
+        <result property="price" column="price" />
+        <result property="sizeId" column="size_id" />
+        <result property="actualStock" column="actual_stock" />
+        <result property="tempStock" column="temp_stock" />
+        <association property="productMst" resultMap="productMstMap"/>
+        <association property="size" resultMap="sizeMap"/>
+    </resultMap>
+
+    <resultMap id="productMstMap" type="com.woofnmeow.wnm_project_back.entity.ProductMst">
+        <id property="productMstId" column="product_mst_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="productCategoryId" column="product_category_id"/>
+        <result property="productDetailText" column="product_detail_text"/>
+        <result property="productThumbnailUrl" column="product_thumbnail_url"/>
+        <result property="productDetailUrl" column="product_detail_url"/>
+        <result property="createDate" column="create_date"/>
+        <association property="petType" resultMap="petTypeMap" />
+        <association property="category" resultMap="categoryMap" />
+    </resultMap>
+
+    <resultMap id="petTypeMap" type="com.woofnmeow.wnm_project_back.entity.PetType">
+        <id property="petTypeId" column="pet_type_id"/>
+        <result property="petTypeName" column="pet_type_name"/>
+    </resultMap>
+
+    <resultMap id="categoryMap" type="com.woofnmeow.wnm_project_back.entity.Category">
+        <id property="productCategoryId" column="product_category_id"/>
+        <result property="productCategoryName" column="product_category_name"/>
+    </resultMap>
+
+    <resultMap id="sizeMap" type="com.woofnmeow.wnm_project_back.entity.Size">
+        <id property="sizeId" column="size_id"/>
+        <result property="sizeName" column="size_name"/>
+    </resultMap>
+
+    <resultMap id="reviewMap" type="com.woofnmeow.wnm_project_back.entity.Review">
+        <id property="reviewId" column="review_id"/>
+        <result property="orderProductsId" column="order_products_id" />
+        <result property="reviewContent" column="review_content" />
+        <result property="reviewImgUrl" column="review_img_url" />
+        <result property="reviewDate" column="reivew_date" />
+    </resultMap>
+
+    <!--  resultMap  -->
+
+
+
+
+
+
+    <!--  Insert  -->
+
+    <insert id="insertOrder" parameterType="com.woofnmeow.wnm_project_back.entity.Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into
+            order_tb
+        values
+            (0, #{userId}, now(), now(), #{shippingName}, #{shippingPhone}, #{shippingAddressNumber}, #{shippingAddressName}, #{shippingAddressDetailName}, 0)
+    </insert>
+
+    <insert id="insertProductsToOrder" parameterType="hashmap">
+        insert into
+            order_products_tb
+        values(0, #{orderId}, #{productDtlId}, #{count})
+    </insert>
+
+    <!--  Insert  -->
+
+
+
+
+
+
+    <!--  select  -->
+
+    <select id="selectOrdersByUserId" parameterType="hashmap" resultMap="ordersMap">
+        select
+            ot.order_id,
+            ot.user_id,
+            ot.order_date,
+            ot.order_update_date,
+            ot.shipping_name,
+            ot.shipping_phone,
+            ot.shipping_address_number,
+            ot.shipping_address_name,
+            ot.shipping_address_detail_name,
+            ot.order_status,
+            opt.order_products_id,
+            opt.count,
+            pdt.product_dtl_id,
+            pdt.price,
+            st.size_id,
+            st.size_name,
+            pmt.product_mst_id,
+            pmt.product_name,
+            pmt.product_thumbnail_url
+        from
+            order_tb ot
+            left outer join order_products_tb opt on(opt.order_id = ot.order_id)
+            left outer join product_dtl_tb pdt on(pdt.product_dtl_id = opt.product_dtl_id)
+            left outer join size_tb st on(st.size_id = pdt.size_id)
+            left outer join product_mst_tb pmt on(pmt.product_mst_id = pdt.product_mst_id)
+        where
+            ot.user_id = #{userId}
+        <choose>
+            <when test="searchOption.equals('받는사람')">
+                and ot.shipping_name like concat("%", #{searchValue}, "%")
+            </when>
+            <when test="searchOption.equals('전화번호')">
+                <if test="!searchValue.equals('')">
+                    and ot.shipping_phone like concat("%", #{searchValue}, "%")
+                </if>
+            </when>
+            <when test="searchOption.equals('주소')">
+                and (ot.shipping_address_name like concat("%", #{searchValue}, "%")
+                or ot.shipping_address_detail_name like concat("%", #{searchValue}, "%"))
+            </when>
+            <when test="searchOption.equals('유저번호')">
+                <if test="!searchValue.equals('')">
+                    and ot.user_id = #{searchValue}
+                </if>
+            </when>
+            <when test="searchOption.equals('주문번호')">
+                <if test="!searchValue.equals('')">
+                    and ot.order_id = #{searchValue}
+                </if>
+            </when>
+            <when test="searchOption.equals('배송상태')">
+                <choose>
+                    <when test="searchValue.equals('배송준비')">
+                        and ot.order_status = 0
+                    </when>
+                    <when test="searchValue.equals('배송중')">
+                        and ot.order_status = 1
+                    </when>
+                    <when test="searchValue.equals('배송완료')">
+                        and ot.order_status = 2
+                    </when>
+                    <when test="searchValue.equals('구매확정')">
+                        and ot.order_status = 3
+                    </when>
+                    <otherwise>
+                        and ot.order_status = 0
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                and ot.shipping_name like concat("%", #{searchValue}, "%")
+            </otherwise>
+        </choose>
+        order by
+        <choose>
+            <when test="sortOption.equals('일자올림차순')">
+                UNIX_TIMESTAMP(order_date) asc
+            </when>
+            <otherwise>
+                UNIX_TIMESTAMP(order_date) desc
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="selectOrdersForAdmin" parameterType="hashmap" resultMap="ordersMap">
+        select
+            order_id,
+            user_id,
+            order_date,
+            order_update_date,
+            shipping_name,
+            shipping_phone,
+            shipping_address_number,
+            shipping_address_name,
+            shipping_address_detail_name,
+            order_status
+        from
+            order_tb
+        where
+            1 = 1
+        <choose>
+            <when test="searchOption.equals('받는사람')">
+                and shipping_name like concat("%", #{searchValue}, "%")
+            </when>
+            <when test="searchOption.equals('전화번호')">
+                <if test="!searchValue.equals('')">
+                    and shipping_phone like concat("%", #{searchValue}, "%")
+                </if>
+            </when>
+            <when test="searchOption.equals('주소')">
+                and (shipping_address_name like concat("%", #{searchValue}, "%")
+                or shipping_address_detail_name like concat("%", #{searchValue}, "%"))
+            </when>
+            <when test="searchOption.equals('유저번호')">
+                <if test="!searchValue.equals('')">
+                    and user_id = #{searchValue}
+                </if>
+            </when>
+            <when test="searchOption.equals('주문번호')">
+                <if test="!searchValue.equals('')">
+                    and order_id = #{searchValue}
+                </if>
+            </when>
+            <when test="searchOption.equals('배송상태')">
+                <choose>
+                    <when test="searchValue.equals('배송준비')">
+                        and order_status = 0
+                    </when>
+                    <when test="searchValue.equals('배송중')">
+                        and order_status = 1
+                    </when>
+                    <when test="searchValue.equals('배송완료')">
+                        and order_status = 2
+                    </when>
+                    <when test="searchValue.equals('구매확정')">
+                        and order_status = 3
+                    </when>
+                    <otherwise>
+                        and order_status = 0
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                and shipping_name like concat("%", #{searchValue}, "%")
+            </otherwise>
+        </choose>
+        order by
+        <choose>
+            <when test="sortOption.equals('일자올림차순')">
+                UNIX_TIMESTAMP(order_date) asc
+            </when>
+            <otherwise>
+                UNIX_TIMESTAMP(order_date) desc
+            </otherwise>
+        </choose>
+        limit
+        #{pageIndex}, 10;
+    </select>
+
+    <select id="getOrderCount" parameterType="com.woofnmeow.wnm_project_back.vo.SearchOrderVo" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            order_tb
+        where
+        1 = 1
+        <choose>
+            <when test="searchOption.equals('받는사람')">
+                and shipping_name like concat("%", #{searchValue}, "%")
+            </when>
+            <when test="searchOption.equals('전화번호')">
+                <if test="!searchValue.equals('')">
+                    and shipping_phone like concat("%", #{searchValue}, "%")
+                </if>
+                and shipping_phone like concat("%", #{searchValue}, "%")
+            </when>
+            <when test="searchOption.equals('주소')">
+                and (shipping_address_name like concat("%", #{searchValue}, "%")
+                or shipping_address_detail_name like concat("%", #{searchValue}, "%"))
+            </when>
+            <when test="searchOption.equals('유저번호')">
+                <if test="!searchValue.equals('')">
+                    and user_id = #{searchValue}
+                </if>
+            </when>
+            <when test="searchOption.equals('주문번호')">
+                <if test="!searchValue.equals('')">
+                    and order_id = #{searchValue}
+                </if>
+            </when>
+            <otherwise>
+                and shipping_name like concat("%", #{searchValue}, "%")
+            </otherwise>
+        </choose>
+        order by
+        <choose>
+            <when test="sortOption.equals('일자올림차순')">
+                UNIX_TIMESTAMP(order_date) asc
+            </when>
+            <otherwise>
+                UNIX_TIMESTAMP(order_date) desc
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+    <select id="selectOrder" resultMap="ordersMap">
+        select
+            ot.order_id,
+            ot.user_id,
+            ot.order_date,
+            ot.order_update_date,
+            ot.shipping_name,
+            ot.shipping_phone,
+            ot.shipping_address_number,
+            ot.shipping_address_name,
+            ot.shipping_address_detail_name,
+            ot.order_status,
+            opt.order_products_id,
+            opt.count,
+            pdt.product_dtl_id,
+            pdt.price,
+            st.size_id,
+            st.size_name,
+            pmt.product_mst_id,
+            pmt.product_name,
+            pmt.product_thumbnail_url,
+            rt.review_id
+        from
+            order_tb ot
+            left outer join order_products_tb opt on(opt.order_id = ot.order_id)
+            left outer join product_dtl_tb pdt on(pdt.product_dtl_id = opt.product_dtl_id)
+            left outer join size_tb st on(st.size_id = pdt.size_id)
+            left outer join product_mst_tb pmt on(pmt.product_mst_id = pdt.product_mst_id)
+            left outer join review_tb rt on(rt.order_products_id = opt.order_products_id)
+        where
+            ot.order_id = #{orderId}
+    </select>
+
+    <!--  select  -->
+
+
+
+
+
+
+
+
+
+    <!--  update  -->
+
+    <update id="updateOrderStatus" statementType="CALLABLE" parameterType="hashmap">
+        call p_update_order_status(#{orderId}, #{orderStatus})
+    </update>
+
+    <!--  update  -->
+
+
+
+
+
+
+
+
+    <!--  delete  -->
+
+    <delete id="deleteOrder">
+        delete
+        from
+            order_tb
+        where
+            order_id = #{orderId}
+    </delete>
+
+    <!--  delete  -->
+
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

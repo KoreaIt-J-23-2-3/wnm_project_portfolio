@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woofnmeow.wnm_project_back.repository.CartMapper">
+
+    <!--  resultMap  -->
+
+    <resultMap id="cartMap" type="com.woofnmeow.wnm_project_back.entity.Cart">
+        <id property="cartId" column="cart_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="productDtlId" column="product_dtl_id"/>
+        <result property="count" column="count"/>
+        <association property="productDtl" resultMap="productDtlMap"/>
+    </resultMap>
+
+    <resultMap id="productDtlMap" type="com.woofnmeow.wnm_project_back.entity.ProductDtl">
+        <id property="productDtlId" column="product_dtl_id" />
+        <result property="productMstId" column="product_mst_id" />
+        <result property="price" column="price" />
+        <result property="sizeId" column="size_id" />
+        <result property="actualStock" column="actual_stock" />
+        <result property="tempStock" column="temp_stock" />
+        <association property="productMst" resultMap="productMstMap"/>
+        <association property="size" resultMap="sizeMap"/>
+    </resultMap>
+
+    <resultMap id="productMstMap" type="com.woofnmeow.wnm_project_back.entity.ProductMst">
+        <id property="productMstId" column="product_mst_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="productCategoryId" column="product_category_id"/>
+        <result property="productDetailText" column="product_detail_text"/>
+        <result property="productThumbnailUrl" column="product_thumbnail_url"/>
+        <result property="productDetailUrl" column="product_detail_url"/>
+        <result property="createDate" column="create_date"/>
+        <association property="petType" resultMap="petTypeMap" />
+        <association property="category" resultMap="categoryMap" />
+    </resultMap>
+
+    <resultMap id="petTypeMap" type="com.woofnmeow.wnm_project_back.entity.PetType">
+        <id property="petTypeId" column="pet_type_id"/>
+        <result property="petTypeName" column="pet_type_name"/>
+    </resultMap>
+
+    <resultMap id="categoryMap" type="com.woofnmeow.wnm_project_back.entity.Category">
+        <id property="productCategoryId" column="product_category_id"/>
+        <result property="productCategoryName" column="product_category_name"/>
+    </resultMap>
+
+    <resultMap id="sizeMap" type="com.woofnmeow.wnm_project_back.entity.Size">
+        <id property="sizeId" column="size_id"/>
+        <result property="sizeName" column="size_name"/>
+    </resultMap>
+
+    <!--  resultMap  -->
+
+
+
+
+    <!--  Insert  -->
+
+    <insert id="insertCart" parameterType="com.woofnmeow.wnm_project_back.entity.Cart" statementType="CALLABLE">
+        {call p_add_cart(#{userId}, #{productDtlId}, #{count})}
+    </insert>
+
+    <!--  Insert  -->
+
+
+
+
+
+
+    <!--  select  -->
+
+    <select id="selectCartByUserId" resultMap="cartMap">
+        select
+            ct.cart_id,
+            ct.count,
+            ct.user_id,
+            pdt.product_dtl_id,
+            pdt.price,
+            pmt.product_name,
+            pmt.product_thumbnail_url,
+            st.size_name,
+            psv.actual_stock,
+            psv.temp_stock
+        from
+            cart_tb ct
+            left outer join product_dtl_tb pdt on(pdt.product_dtl_id = ct.product_dtl_id)
+            left outer join product_mst_tb pmt on(pmt.product_mst_id = pdt.product_mst_id)
+            left outer join size_tb st on(st.size_id = pdt.size_id)
+            left outer join product_stock_view psv on(psv.product_dtl_id = pdt.product_dtl_id)
+        where
+            ct.user_id = #{user_id}
+    </select>
+
+    <select id="getProductCount" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            cart_tb
+        where
+            product_dtl_id = #{productDtlId}
+            and user_id = #{userId}
+    </select>
+
+    <!--  select  -->
+
+
+
+
+
+    <!--  update  -->
+
+    <!--  update  -->
+
+
+
+
+
+
+    <!--  delete  -->
+
+    <delete id="deleteProductOfCart">
+        delete
+        from
+            cart_tb
+        where
+            cart_id = #{cartId}
+    </delete>
+
+    <delete id="deleteProductOfCartWhenIsCart">
+        delete
+        from
+            cart_tb
+        where
+            user_id = #{userId}
+        and product_dtl_id in (
+        <foreach collection="products" item="productDtlId" separator=",">
+            #{productDtlId}
+        </foreach>
+        )
+    </delete>
+
+    <!--  delete  -->
+
+</mapper >
